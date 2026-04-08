@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phongtrogiangon.com - Hệ thống phòng trọ giá tốt</title>
+    <style>
+        /* --- CSS TỔNG HỢP --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f4f7f6; color: #333; overflow-x: hidden; }
+        
+        header { background: #1a252f; color: white; padding: 1rem 5%; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .logo { font-size: 1.4rem; font-weight: bold; color: #3498db; cursor: pointer; text-transform: none; letter-spacing: 0.5px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 20px; cursor: pointer; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; border-radius: 20px; transition: 0.3s; }
+        .nav-links a:hover { background: #3498db; border-color: #3498db; }
+
+        .hero { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1000&q=80');
+                background-size: cover; background-position: center; height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; }
+        .hero h1 { font-size: 2rem; margin-bottom: 10px; }
+
+        main { padding: 2rem 5%; max-width: 1200px; margin: auto; min-height: 80vh; }
+        
+        /* Grid & Card */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; border: 1px solid #eee; position: relative; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .card-img { width: 100%; height: 180px; object-fit: cover; background: #eee; }
+        .card-body { padding: 15px; }
+        .price { color: #e74c3c; font-weight: bold; font-size: 1.2rem; }
+        .addr { font-size: 0.85rem; color: #777; margin: 5px 0; }
+
+        /* MODAL CHI TIẾT & ALBUMN */
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); overflow-y: auto; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: auto; max-width: 700px; border-radius: 15px; overflow: hidden; position: relative; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from {transform: translateY(100px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+        
+        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 25px; cursor: pointer; color: #333; z-index: 10; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        
+        .gallery-container { width: 100%; background: #000; text-align: center; }
+        .modal-main-img { max-width: 100%; max-height: 450px; vertical-align: middle; }
+        .gallery-thumbs { display: flex; gap: 5px; padding: 10px; background: #f8f9fa; overflow-x: auto; border-bottom: 1px solid #eee; }
+        .thumb-img { width: 60px; height: 60px; object-fit: cover; cursor: pointer; border: 2px solid transparent; border-radius: 4px; opacity: 0.7; }
+        .thumb-img.active { border-color: #3498db; opacity: 1; }
+
+        .modal-info { padding: 25px; }
+        .modal-desc { line-height: 1.8; color: #444; white-space: pre-line; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; font-size: 0.95rem; }
+
+        /* Admin Panel */
+        #admin-panel { display: none; background: #fff; padding: 25px; border-radius: 12px; margin-bottom: 30px; border: 2px dashed #3498db; box-shadow: 0 5px 15px rgba(52,152,219,0.1); }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        .btn-post { width: 100%; padding: 15px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 10px; }
+
+        /* Preview ảnh khi đăng */
+        .preview-thumbs-container { display: flex; gap: 5px; margin-top: 10px; flex-wrap: wrap; }
+        .preview-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #eee; }
+
+        /* Nút liên hệ */
+        .contact-bar { display: flex; gap: 10px; margin-top: 25px; }
+        .btn-call { flex: 1; background: #27ae60; color: white; text-align: center; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-zalo { flex: 1; background: #0068ff; color: white; text-align: center; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        .hidden { display: none !important; }
+        .badge-admin { position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        footer { text-align: center; padding: 2rem; background: #1a252f; color: #95a5a6; margin-top: 50px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo" onclick="location.reload()">Phongtrogiangon.com</div>
+    <div class="nav-links">
+        <a onclick="loginAdmin()" id="admin-btn">🔑 Admin</a>
+        <a onclick="logoutAdmin()" id="logout-btn" class="hidden" style="color: #ff4757; border-color: #ff4757;">🚪 Thoát</a>
+    </div>
+</header>
+
+<div class="hero">
+    <h1>Phongtrogiangon.com</h1>
+    <p>Uy tín - Giá tốt - Hình ảnh thực tế 100%</p>
+</div>
+
+<main>
+    <section id="admin-panel">
+        <h2 style="margin-bottom:20px; color: #2c3e50;">✍️ Quản trị Phongtrogiangon.com</h2>
+        <div class="form-group">
+            <label>Tiêu đề bài đăng:</label>
+            <input type="text" id="p-title" placeholder="VD: Phòng Studio Q1 full nội thất">
+        </div>
+        <div style="display:flex; gap:15px;">
+            <div class="form-group" style="flex:1">
+                <label>Giá thuê:</label>
+                <input type="text" id="p-price" placeholder="VD: 5 Triệu/tháng">
+            </div>
+            <div class="form-group" style="flex:1">
+                <label>Địa chỉ:</label>
+                <input type="text" id="p-addr" placeholder="Quận, Tên đường...">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Hình ảnh phòng (Chọn nhiều ảnh):</label>
+            <input type="file" id="p-img" accept="image/*" multiple onchange="handleMultipleImages(this)">
+            <div id="preview-thumbs" class="preview-thumbs-container"></div>
+        </div>
+        <div class="form-group">
+            <label>Mô tả chi tiết:</label>
+            <textarea id="p-desc" rows="5" placeholder="Thông tin tiện nghi..."></textarea>
+        </div>
+        <button class="btn-post" onclick="addNewPost()">XÁC NHẬN ĐĂNG BÀI</button>
+    </section>
+
+    <h2 style="margin-bottom:25px; border-left: 5px solid #3498db; padding-left: 15px;">Phòng trống hôm nay</h2>
+    <div class="grid" id="post-container"></div>
+</main>
+
+<div id="detailModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <div class="gallery-container">
+            <img id="m-main-img" src="" class="modal-main-img">
+        </div>
+        <div id="m-thumbs" class="gallery-thumbs"></div>
+        <div class="modal-info">
+            <h2 id="m-title"></h2>
+            <p id="m-price" class="price" style="font-size: 1.6rem;"></p>
+            <p id="m-addr" class="addr" style="font-size: 1rem; margin-top: 5px;"></p>
+            <div id="m-desc" class="modal-desc"></div>
+            <div class="contact-bar">
+                <a href="#" id="m-call" class="btn-call">📞 Gọi ngay</a>
+                <a href="#" id="m-zalo" class="btn-zalo" target="_blank">💬 Chat Zalo</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2026 Phongtrogiangon.com - Hotline: 0326.267.710</p>
+</footer>
+
+<script>
+    const CONFIG = {
+        PASS: "10112007",
+        PHONE: "0326267710",
+        ZALO: "0326267710"
+    };
+
+    let posts = [
+        {
+            title: "Phòng trọ giá ngon đầy đủ tiện ích",
+            price: "4.000.000đ",
+            addr: "Quận 10, TP.HCM",
+            desc: "Chào mừng bạn đến với Phongtrogiangon.com!\n- Phòng sạch sẽ, thoáng mát.\n- Giờ giấc tự do.\n- An ninh đảm bảo.",
+            images: ["https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600"]
+        }
+    ];
+
+    let isAdmin = false;
+    let tempImgArrayBase64 = [];
+
+    function loginAdmin() {
+        if(prompt("Nhập mã bảo mật Admin:") === CONFIG.PASS) {
+            isAdmin = true;
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('admin-btn').classList.add('hidden');
+            document.getElementById('logout-btn').classList.remove('hidden');
+            renderPosts();
+            alert("Chào sếp! Đã đăng nhập vào Phongtrogiangon.com");
+        } else {
+            alert("Mật khẩu sai!");
+        }
+    }
+
+    function logoutAdmin() { location.reload(); }
+
+    function handleMultipleImages(input) {
+        tempImgArrayBase64 = [];
+        const previewContainer = document.getElementById('preview-thumbs');
+        previewContainer.innerHTML = '';
+        if (input.files) {
+            for (let i = 0; i < input.files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    tempImgArrayBase64.push(e.target.result);
+                    previewContainer.innerHTML += `<img src="${e.target.result}" class="preview-thumb">`;
+                };
+                reader.readAsDataURL(input.files[i]);
+            }
+        }
+    }
+
+    function renderPosts() {
+        const container = document.getElementById('post-container');
+        container.innerHTML = '';
+        posts.forEach((p, index) => {
+            const coverImg = (p.images && p.images.length > 0) ? p.images[0] : 'https://via.placeholder.com/400x250';
+            container.innerHTML += `
+                <div class="card" onclick="openModal(${index})">
+                    ${isAdmin ? '<span class="badge-admin">Admin</span>' : ''}
+                    <img src="${coverImg}" class="card-img">
+                    <div class="card-body">
+                        <div class="price">${p.price}</div>
+                        <div style="font-weight:600; margin:5px 0;">${p.title}</div>
+                        <div class="addr">📍 ${p.addr}</div>
+                        ${isAdmin ? `<button onclick="event.stopPropagation(); deletePost(${index})" style="color:red; border:none; background:none; cursor:pointer; font-size:0.8rem; margin-top:10px;">[XÓA BÀI]</button>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function openModal(index) {
+        const p = posts[index];
+        const mainImg = document.getElementById('m-main-img');
+        const thumbsContainer = document.getElementById('m-thumbs');
+        thumbsContainer.innerHTML = '';
+        if (p.images && p.images.length > 0) {
+            mainImg.src = p.images[0];
+            p.images.forEach((imgUrl, i) => {
+                const thumb = document.createElement('img');
+                thumb.src = imgUrl;
+                thumb.classList.add('thumb-img');
+                if(i===0) thumb.classList.add('active');
+                thumb.onclick = function() {
+                    mainImg.src = imgUrl;
+                    document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                };
+                thumbsContainer.appendChild(thumb);
+            });
+        }
+        document.getElementById('m-title').innerText = p.title;
+        document.getElementById('m-price').innerText = p.price;
+        document.getElementById('m-addr').innerText = "📍 " + p.addr;
+        document.getElementById('m-desc').innerText = p.desc;
+        document.getElementById('m-call').href = "tel:" + CONFIG.PHONE;
+        document.getElementById('m-zalo').href = "https://zalo.me/" + CONFIG.ZALO;
+        document.getElementById('detailModal').style.display = 'block';
+        document.body.style.overflow = 'hidden'; 
+    }
+
+    function closeModal() {
+        document.getElementById('detailModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    window.onclick = (e) => { if (e.target == document.getElementById('detailModal')) closeModal(); }
+
+    function addNewPost() {
+        const title = document.getElementById('p-title').value;
+        const price = document.getElementById('p-price').value;
+        const addr = document.getElementById('p-addr').value;
+        const desc = document.getElementById('p-desc').value;
+        if(!title || !price || !addr) return alert("Điền đủ thông tin sếp ơi!");
+        posts.unshift({ title, price, addr, desc, images: tempImgArrayBase64 });
+        alert("Đã đăng lên Phongtrogiangon.com!");
+        document.getElementById('p-title').value = '';
+        document.getElementById('p-price').value = '';
+        document.getElementById('p-addr').value = '';
+        document.getElementById('p-desc').value = '';
+        document.getElementById('preview-thumbs').innerHTML = '';
+        tempImgArrayBase64 = [];
+        renderPosts();
+    }
+
+    function deletePost(index) {
+        if(confirm("Xóa tin này nhé sếp?")) {
+            posts.splice(index, 1);
+            renderPosts();
+        }
+    }
+    renderPosts();
+</script>
+</body>
+</html>
